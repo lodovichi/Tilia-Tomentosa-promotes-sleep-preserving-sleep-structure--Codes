@@ -1,0 +1,43 @@
+%%
+
+% Parabolic fit for removal of 50 and 100 Hz artifact on EEG spectra N and ZT (be carefull
+% to check if ZT is referred to day or night, and change accordingly in the script 
+% "totalCntNZTday" or "totalCntNZTnight" or "totalTiliaNZTday" or
+% "totalTiliaNZTnight"
+
+ind50Hz1 = 180;
+ind50Hz2 = 190;
+ind50Hz3 = 212;
+ind50Hz4 = 222;
+
+ind100Hz1 = 363;
+ind100Hz2 = 373;
+ind100Hz3 = 440;
+ind100Hz4 = 450;
+
+x50Hz = [ind50Hz1:ind50Hz2 ind50Hz3:ind50Hz4];
+x100Hz = [ind100Hz1:ind100Hz2 ind100Hz3:ind100Hz4];
+fit50x = ind50Hz2+1:ind50Hz3-1;
+fit100x = ind100Hz2+1:ind100Hz3-1;
+totalCntNZTnight50 = totalCntNZTnight; %
+
+for mouse=1:5
+    for Ch=1:2
+        for State=1:3
+            % Extract the data that buids up the y vector
+            tmp = squeeze(totalCntNZTnight(mouse,Ch,State,:));
+            tmp = tmp';
+            y = [tmp(ind50Hz1:ind50Hz2) tmp(ind50Hz3:ind50Hz4)];
+            p50 = polyfit(x50Hz,y,2);
+            fit50 = p50(1) * fit50x .* fit50x + p50(2) * fit50x + p50(3);
+            totalCntNZTnight50 (mouse,Ch,State,ind50Hz2+1:ind50Hz3-1) = fit50;
+            y = [tmp(ind100Hz1:ind100Hz2) tmp(ind100Hz3:ind100Hz4)];
+            p100 = polyfit(x100Hz,y,2);
+            fit100 = p100(1) * fit100x .* fit100x + p100(2) * fit100x + p100(3);
+            totalCntNZTnight50 (mouse,Ch,State, ind100Hz2+1:ind100Hz3-1) = fit100;
+        end
+    end
+end
+
+ 
+        
